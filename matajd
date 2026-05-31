@@ -13,7 +13,7 @@ class CrosshairOverlay:
         h = self.root.winfo_screenheight()
         self.root.geometry(f"{w}x{h}+0+0")
 
-        # Crosshair list (7 total)
+        # Crosshair list (10 total)
         self.crosshairs = [
             ("cross", "green", 25),      # 1
             ("dot", "red", 10),          # 2
@@ -21,7 +21,10 @@ class CrosshairOverlay:
             ("t", "yellow", 25),         # 4
             ("vup", "orange", 30),       # 5
             ("x", "black", 25),          # 6
-            ("heart", "pink", 20)        # 7
+            ("heart", "pink", 20),       # 7
+            ("triangle", "white", 30),   # 8
+            ("vline", "purple", 35),     # 9
+            ("star", "gold", 25)         # 0
         ]
 
         self.current = 0
@@ -44,8 +47,11 @@ class CrosshairOverlay:
             self.visible = not self.visible
             self.root.attributes("-alpha", 1 if self.visible else 0)
 
-        elif key in ["1","2","3","4","5","6","7"]:
-            self.current = int(key) - 1
+        elif key in ["1","2","3","4","5","6","7","8","9","0"]:
+            if key == "0":
+                self.current = 9
+            else:
+                self.current = int(key) - 1
             self.draw_crosshair()
 
     def draw_crosshair(self):
@@ -72,8 +78,7 @@ class CrosshairOverlay:
             self.canvas.create_line(w, h, w, h + size, fill=color, width=4)
             self.canvas.create_line(w - size//2, h, w + size//2, h, fill=color, width=4)
 
-        # --- New shapes ---
-        elif shape == "vup":  # upside‑down V
+        elif shape == "vup":
             self.canvas.create_line(w - size, h + size, w, h - size, fill=color, width=4)
             self.canvas.create_line(w, h - size, w + size, h + size, fill=color, width=4)
 
@@ -82,7 +87,6 @@ class CrosshairOverlay:
             self.canvas.create_line(w - size, h + size, w + size, h - size, fill=color, width=4)
 
         elif shape == "heart":
-            # Heart shape using two arcs + triangle bottom
             self.canvas.create_arc(w - size, h - size, w, h, start=0, extent=180,
                                    style="arc", outline=color, width=3)
             self.canvas.create_arc(w, h - size, w + size, h, start=0, extent=180,
@@ -94,4 +98,36 @@ class CrosshairOverlay:
                 outline=color, fill="", width=3
             )
 
+        # --- New shapes ---
+        elif shape == "triangle":
+            self.canvas.create_polygon(
+                w, h - size,
+                w - size, h + size,
+                w + size, h + size,
+                outline=color, fill="", width=3
+            )
+
+        elif shape == "vline":
+            self.canvas.create_line(
+                w, h - size,
+                w, h + size,
+                fill=color, width=4
+            )
+
+        elif shape == "star":
+            points = [
+                w, h - size,
+                w + size*0.4, h - size*0.2,
+                w + size, h - size*0.2,
+                w + size*0.5, h + size*0.2,
+                w + size*0.7, h + size,
+                w, h + size*0.5,
+                w - size*0.7, h + size,
+                w - size*0.5, h + size*0.2,
+                w - size, h - size*0.2,
+                w - size*0.4, h - size*0.2
+            ]
+            self.canvas.create_polygon(points, outline=color, fill="", width=3)
+
 CrosshairOverlay()
+
